@@ -1,0 +1,19 @@
+{
+  "name": "nodeauthenticator",
+  "version": "1.0.0",
+  "description": "NodeJS Authenticator app",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://kailashchivhe@github.com/kailashchivhe/NodeAuthenticator.git"
+  },
+  "author": "Kailash",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/kailashchivhe/NodeAuthenticator/issues"
+  },
+  "homepage": "https://github.com/kailashchivhe/NodeAuthenticator#readme"
+}
