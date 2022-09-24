@@ -28,15 +28,17 @@ exports.login = (req, res) => {
     User.findOne({
         email: req.body.email
     })
-    .populate("-__v")
     .exec((err, user) => {
         if (err) {
             res.status(500).send({ message: err });
             return;
         }
-        
+
         if (!user) {
-            return res.status(404).send({ message: "User not found."});
+            return res.status(404).send({
+                id: null,
+                message: "User not found."
+            });
         }
 
         var passwordIsValid = bcrypt.compareSync(
@@ -50,17 +52,22 @@ exports.login = (req, res) => {
                 message: "Invalid Password."
             });
         }
-
-        var token = jwt.sign({ id: user.id }, config.secret, {
-            expiresIn: 86400 // 24 hours
-        });
+        
+        let token = jwt.sign(
+            { id: user.id }, 
+            config.secret, 
+            { expiresIn: 86400 } // 24 hours
+        );
 
         res.status(200).send({
-            id: user._id,
-            email: user.email,
-            first_name: user.first_name,
-            last_name: user.last_name,
-            accessToken: token
+            status: "success",
+            data: {
+                id: user._id,
+                email: user.email,
+                first_name: user.first_name,
+                last_name: user.last_name,
+                accessToken: token
+            }
           });
     });
 };
