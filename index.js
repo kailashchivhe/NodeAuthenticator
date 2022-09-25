@@ -1,11 +1,9 @@
-const express = require('express');
-const mongoose = require('mongoose');
+const expressModule = require('express');
+const app = expressModule();
 
-const app = express();
-
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use(express.text());
+app.use(expressModule.json());
+app.use(expressModule.urlencoded({ extended: true }));
+app.use(expressModule.text());
 
 const db = require("./app/models");
 const dbConfig = require("./app/config/db.config");
