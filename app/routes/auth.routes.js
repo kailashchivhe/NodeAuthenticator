@@ -19,4 +19,6 @@ module.exports = function(app) {
     );
 
     app.post("/api/auth/login", controller.login);
+
+    app.get("/api/auth/profile", controller.profile);
 };

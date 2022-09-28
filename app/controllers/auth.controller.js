@@ -71,3 +71,49 @@ exports.login = (req, res) => {
           });
     });
 };
+
+exports.profile = (req, res) => {
+    let emailId = req.body.email;
+    let token = req.body.token;
+    if(token && emailId){
+        jwt.verify(token, config.secret, function(err, decoded) {
+            if(err){
+                return res.status(401).send({
+                    accessToken: null,
+                    message: "Invalid Token."
+                });
+            }
+            else{
+                User.findOne({'email': emailId}).exec((err, user) => {
+                    if (err) {
+                        res.status(500).send({ message: err });
+                        return;
+                    }
+        
+                    if (!user) {
+                        return res.status(404).send({
+                            id: null,
+                            message: "User not found."
+                        });
+                    }
+        
+                    res.status(200).send({
+                        status: "success",
+                        data: {
+                            id: user._id,
+                            email: user.email,
+                            first_name: user.first_name,
+                            last_name: user.last_name
+                        }
+                    });
+                });
+            }
+        });
+    }
+    else{
+        return res.status(401).send({
+            accessToken: null,
+            message: "Token Empty"
+        });
+    }
+};
