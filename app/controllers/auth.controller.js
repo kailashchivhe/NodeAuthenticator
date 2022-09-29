@@ -54,66 +54,66 @@ exports.login = (req, res) => {
         }
         
         let token = jwt.sign(
-            { id: user.id }, 
+            //{ id: user.id }, 
+            { user },
             config.secret, 
             { expiresIn: 86400 } // 24 hours
         );
 
         res.status(200).send({
-            status: "success",
-            data: {
-                id: user._id,
-                email: user.email,
-                first_name: user.first_name,
-                last_name: user.last_name,
-                accessToken: token
-            }
-          });
+            token: token
+        })
     });
 };
 
 exports.profile = (req, res) => {
-    let emailId = req.body.email;
-    let token = req.body.token;
-    if(token && emailId){
-        jwt.verify(token, config.secret, function(err, decoded) {
-            if(err){
-                return res.status(401).send({
-                    accessToken: null,
-                    message: "Invalid Token."
-                });
-            }
-            else{
-                User.findOne({'email': emailId}).exec((err, user) => {
-                    if (err) {
-                        res.status(500).send({ message: err });
-                        return;
-                    }
+    let decodedToken = req.decodedToken;
+
+    res.status(200).send({
+        message: 'Successful log in',
+        data: {
+            decoded: decodedToken
+        }
+    });
+};
+
+exports.checkDuplicateEmail = (req, res, next) => {
+    //Check for duplicate username -- if found, signup error occurs
+    User.findOne({
+        email: req.body.email
+    }).exec((err, user) => {
+        if (err) {
+            res.status(500).send({ message: err });
+            return;
+        }
+        if (user) {
+            res.status(400).send({ message: "Signup failed! Email is already in use!" });
+            return;
+        }
+
+        next();
+    })
+};
+exports.verifyToken = (req, res, next) => {
+    let token = req.headers["x-jwt-token"];
+    if (token) {
+        try {
+            let decoded = jwt.verify(token, config.secret);
+            req.decodedToken = decoded;
+            next();
+
+
+            res.status(200).send({
+                status: "success",
+                data: {
+                    user: user
+                },
+            });
         
-                    if (!user) {
-                        return res.status(404).send({
-                            id: null,
-                            message: "User not found."
-                        });
-                    }
-        
-                    res.status(200).send({
-                        status: "success",
-                        data: {
-                            id: user._id,
-                            email: user.email,
-                            first_name: user.first_name,
-                            last_name: user.last_name
-                        }
-                    });
-                });
-            }
-        });
-    }
-    else{
-        return res.status(401).send({
-            accessToken: null,
-            message: "Token Empty"
-        });
+        } catch (err) {
+            return res.status(401).send({ message: "Invalid token provided!", fullError: err });  
+        }
+    } else {
+        res.status(401).send({ error: "Token is required!" })
     }
 };
