@@ -95,7 +95,7 @@ exports.checkDuplicateEmail = (req, res, next) => {
     })
 };
 exports.verifyToken = (req, res, next) => {
-    let token = req.headers["x-jwt-token"];
+    let token = req.params.token;
     if (token) {
         try {
             let decoded = jwt.verify(token, config.secret);
