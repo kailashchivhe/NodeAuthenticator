@@ -8,15 +8,9 @@ module.exports = function(app) {
         );
         next();
     });
-
-    app.post(
-        "/api/auth/signup",
-        [
-           controller.checkDuplicateEmail
-        ],
-        controller.signup
-    );
-
+    app.post("/api/auth/signup", controller.signup);
     app.post("/api/auth/login", controller.login);
     app.get("/api/auth/profile", controller.verifyToken, controller.profile);
+    app.put("/updateFirstName/:email", controller.updateFirstName);
+    app.put("/updateLastName/:email", controller.updateLastName);
 };
