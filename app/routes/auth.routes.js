@@ -11,6 +11,7 @@ module.exports = function(app) {
     app.post("/api/auth/signup", controller.signup);
     app.post("/api/auth/login", controller.login);
     app.get("/api/auth/profile", controller.verifyToken, controller.profile);
-    app.put("/updateFirstName/:email", controller.updateFirstName);
-    app.put("/updateLastName/:email", controller.updateLastName);
+    // app.put("/updateFirstName/:email", controller.updateFirstName);
+    // app.put("/updateLastName/:email", controller.updateLastName);
+    // app.post("/api/auth/profile", controller.verifyToken, controller.update );
 };

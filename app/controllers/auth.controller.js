@@ -69,14 +69,14 @@ exports.login = (req, res) => {
         }
         
         let token = jwt.sign(
-            //{ id: user.id }, 
             { user },
             config.secret, 
             { expiresIn: 86400 } // 24 hours
         );
 
         res.status(200).send({
-            token: token
+            token: token,
+            id: user.id
         })
     });
 };
@@ -147,7 +147,7 @@ exports.checkDuplicateEmail = (req, res, next) => {
 */
 
 exports.verifyToken = (req, res, next) => {
-    let token = req.headers["x-access-token"];
+    let token = req.params.token;
 
     if (!token) {
         return res.status(403).send({ message: "No token provided!" });  
@@ -160,28 +160,6 @@ exports.verifyToken = (req, res, next) => {
         req.email = decoded.email;
         next();
       });
-
-    /*
-    let token = req.header("x-access-token");
-    if (token) {
-        try {
-            let decoded = jwt.verify(token, config.secret);
-            req.decodedToken = decoded;
-            next();
-            res.status(200).send({
-                status: "success",
-                data: {
-                    user: user
-                },
-            });
-        
-        } catch (err) {
-            return res.status(401).send({ message: "Invalid token provided!", fullError: err });  
-        }
-    } else {
-        res.status(401).send({ error: "Token is required!" })
-    }
-    */
 };
 
 //braintree
