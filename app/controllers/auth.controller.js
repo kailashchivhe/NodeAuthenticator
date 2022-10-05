@@ -92,6 +92,41 @@ exports.profile = (req, res) => {
     });
 };
 
+exports.updateFirstName = (req, res) => {
+    User.findOne({ email: req.params.email }, (err, user) => {
+        let newData = {$set: { first_name: req.body.first_name }};
+        if(err) {
+            return res.status(500).send(err);
+        }
+        User.updateOne({ email: user.email }, newData, (err, user) => {
+            if (err) {
+                console.log("Unable to update data in your collection")
+            } else {
+                console.log(user)
+                res.status(200).send({ message: "User first name successfully updated!" });
+            }  
+        });
+    })
+}
+
+exports.updateLastName = (req, res) => {
+    User.findOne({ email: req.params.email }, (err, user) => {
+        let newData = {$set: { last_name: req.body.last_name }};
+        if(err) {
+            return res.status(500).send(err);
+        }
+        User.updateOne({ email: user.email }, newData, (err, user) => {
+            if (err) {
+                console.log("Unable to update data in your collection")
+            } else {
+                console.log(user)
+                res.status(200).send({ message: "User last name successfully updated!" })
+            }
+        });
+    })
+}
+
+/*
 exports.checkDuplicateEmail = (req, res, next) => {
     //Check for duplicate username -- if found, signup error occurs
     User.findOne({
@@ -109,8 +144,25 @@ exports.checkDuplicateEmail = (req, res, next) => {
         next();
     })
 };
+*/
+
 exports.verifyToken = (req, res, next) => {
-    let token = req.params.token;
+    let token = req.headers["x-access-token"];
+
+    if (!token) {
+        return res.status(403).send({ message: "No token provided!" });  
+    }
+
+    jwt.verify(token, config.secret, (err, decoded) => {
+        if (err) {
+          return res.status(401).send({ message: "Unauthorized!" });
+        }
+        req.email = decoded.email;
+        next();
+      });
+
+    /*
+    let token = req.header("x-access-token");
     if (token) {
         try {
             let decoded = jwt.verify(token, config.secret);
@@ -129,6 +181,7 @@ exports.verifyToken = (req, res, next) => {
     } else {
         res.status(401).send({ error: "Token is required!" })
     }
+    */
 };
 
 //braintree
