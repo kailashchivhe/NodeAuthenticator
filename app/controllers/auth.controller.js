@@ -17,26 +17,37 @@ exports.signup = (req, res) => {
     const newUser = new User({
         email: req.body.email,
         password: bcrypt.hashSync(req.body.password, 8),
-        first_name: req.body.first_name,
-        last_name: req.body.last_name,
+        firstName: req.body.firstName,
+        lastName: req.body.lastName,
     });
-
-    braintree.createCustomer(newUser).then(result => {
-        if(result.success){
-            newUser.save((err, user) => {
-                if (err) {
-                    res.status(500).send({ message: err });
-                }
-                else {
-                    console.log(user);
-                    res.status(200).send({ message: "User was registered successfully!" });
-                }
-            });
+    newUser.save((err, user) => {
+        if (err) {
+            res.status(500).send({ message: err });
         }
-        else{
-            res.status(500).send({message: "User was not registered" });
+        else {
+            console.log(user);
+            res.status(200).send({ message: "User was registered successfully!" });
         }
-      });
+    });
+    // const braintreeUser = {"email":newUser.email, "firstName": newUser.firstName, "lastName": newUser.lastName, "id":newUser._id };
+    // gateway.customer.create(braintreeUser).then(result => {
+    //     if(result.success){
+    //         newUser.save((err, user) => {
+    //             if (err) {
+    //                 res.status(500).send({ message: err });
+    //             }
+    //             else {
+    //                 console.log(user);
+    //                 res.status(200).send({ message: "User was registered successfully!" });
+    //             }
+    //         });
+    //     }
+    //     else{
+    //         res.status(500).send({message: "User was not registered" });
+    //     }
+    //   }).catch(error=>{
+    //     console.log(error);
+    //   });
 };
 
 exports.login = (req, res) => {
@@ -82,72 +93,44 @@ exports.login = (req, res) => {
 };
 
 exports.profile = (req, res) => {
-    let decodedToken = req.decodedToken;
-
-    res.status(200).send({
-        message: 'Successful log in',
-        data: {
-            decoded: decodedToken
+    let id = req.query.userId;
+    User.findById(id, function (err, docs) {
+        if (err){
+            console.log(err);
+            res.status(404).send({
+                id: null,
+                message: "User not found."
+            });
+        }
+        else{
+            res.status(200).send({
+                message: 'Success',
+                data: docs
+            })
         }
     });
 };
 
-exports.updateFirstName = (req, res) => {
-    User.findOne({ email: req.params.email }, (err, user) => {
-        let newData = {$set: { first_name: req.body.first_name }};
-        if(err) {
-            return res.status(500).send(err);
-        }
-        User.updateOne({ email: user.email }, newData, (err, user) => {
-            if (err) {
-                console.log("Unable to update data in your collection")
-            } else {
-                console.log(user)
-                res.status(200).send({ message: "User first name successfully updated!" });
-            }  
-        });
-    })
-}
+exports.updateUser = (req, res) => {
+    let user = req.body;
+    let id = req.query.id;
 
-exports.updateLastName = (req, res) => {
-    User.findOne({ email: req.params.email }, (err, user) => {
-        let newData = {$set: { last_name: req.body.last_name }};
-        if(err) {
-            return res.status(500).send(err);
-        }
-        User.updateOne({ email: user.email }, newData, (err, user) => {
-            if (err) {
-                console.log("Unable to update data in your collection")
-            } else {
-                console.log(user)
-                res.status(200).send({ message: "User last name successfully updated!" })
-            }
-        });
-    })
-}
-
-/*
-exports.checkDuplicateEmail = (req, res, next) => {
-    //Check for duplicate username -- if found, signup error occurs
-    User.findOne({
-        email: req.body.email
-    }).exec((err, user) => {
-        if (err) {
-            res.status(500).send({ message: err });
-            return;
-        }
+    User.findByIdAndUpdate(id, user, { useFindAndModify: false, runValidators: true })
+    .then(user => {
         if (user) {
-            res.status(400).send({ message: "Signup failed! Email is already in use!" });
-            return;
+            res.status(200).send('success')
+        } else {
+            let err = new Error('Cannot find user with id ' + id);
+            res.status(404).send(err);
         }
-
-        next();
     })
-};
-*/
+    .catch(err => {
+        res.status(400).send(err);
+    });
+}
 
 exports.verifyToken = (req, res, next) => {
-    let token = req.params.token;
+    let token = req.query.token;
 
     if (!token) {
         return res.status(403).send({ message: "No token provided!" });  
@@ -161,16 +144,6 @@ exports.verifyToken = (req, res, next) => {
         next();
       });
 };
-
-//braintree
-function createCustomer(user){
-    return gateway.customer.create({
-        firstName: user.first_name,
-        lastName: user.last_name,
-        email: user.email,
-        id: user.email
-      });
-}
 
 function getToken(email){
     gateway.clientToken.generate({
