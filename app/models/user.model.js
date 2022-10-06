@@ -14,6 +14,9 @@ const User = new Schema({
     lastName: {
         type: String
     },
+    customerId:{
+        type: String
+    }
 });
 
 module.exports = mongoose.model('users', User);

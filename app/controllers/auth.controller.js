@@ -2,17 +2,10 @@ const config = require("../config/auth.config");
 const db = require("../models");
 const User = db.user;
 const Item = db.item;
-const braintree = require("braintree");
+const braintree = require("./braintree.controller")
 
 var jwt = require("jsonwebtoken");
 var bcrypt = require("bcryptjs");
-
-const gateway = new braintree.BraintreeGateway({
-  environment: braintree.Environment.Sandbox,
-  merchantId: "64jmbtt6hp89zxz2",
-  publicKey: "469wp5pwhq2s4st3",
-  privateKey: "e1a475d96520b7f033209db7853da770"
-});
 
 exports.signup = (req, res) => {
     const newUser = new User({
@@ -21,33 +14,7 @@ exports.signup = (req, res) => {
         firstName: req.body.firstName,
         lastName: req.body.lastName,
     });
-    newUser.save((err, user) => {
-        if (err) {
-            res.status(500).send({ message: err });
-        }
-        else {
-            res.status(200).send({ message: "User was registered successfully!" });
-        }
-    });
-    // const braintreeUser = {"email":newUser.email, "firstName": newUser.firstName, "lastName": newUser.lastName, "id":newUser._id };
-    // gateway.customer.create(braintreeUser).then(result => {
-    //     if(result.success){
-    //         newUser.save((err, user) => {
-    //             if (err) {
-    //                 res.status(500).send({ message: err });
-    //             }
-    //             else {
-    //                 console.log(user);
-    //                 res.status(200).send({ message: "User was registered successfully!" });
-    //             }
-    //         });
-    //     }
-    //     else{
-    //         res.status(500).send({message: "User was not registered" });
-    //     }
-    //   }).catch(error=>{
-    //     console.log(error);
-    //   });
+    braintree.createCustomer(newUser, req, res);
 };
 
 exports.login = (req, res) => {
@@ -150,31 +117,4 @@ exports.getItems = (req, res) => {
         console.log(items);
         return res.status(200).send({ items: items });  
       });
-}
-
-function getToken(email){
-    gateway.clientToken.generate({
-        customerId: email
-      }).then(response => {
-        // pass clientToken to your front-end
-        const clientToken = response.clientToken
-      });
-}
-
-function checkout(){
-    app.post("/checkout", (req, res) => {
-        const nonceFromTheClient = req.body.payment_method_nonce;
-        // Use payment method nonce here
-      });
-}
-
-function createTransaction(){
-    gateway.transaction.sale({
-        amount: "10.00",
-        paymentMethodNonce: nonceFromTheClient,
-        deviceData: deviceDataFromTheClient,
-        options: {
-          submitForSettlement: true
-        }
-      }).then(result => { });
 }
