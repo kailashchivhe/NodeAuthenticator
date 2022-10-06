@@ -143,6 +143,14 @@ exports.verifyToken = (req, res, next) => {
       });
 };
 
+exports.getItems = (req, res) => {
+    Item.find({}, (err, items) => {
+        if (err) throw err;
+        console.log(items);
+        return res.status(200).send({ items: items });  
+      });
+}
+
 function getToken(email){
     gateway.clientToken.generate({
         customerId: email

@@ -12,7 +12,9 @@ module.exports = function(app) {
     app.post("/api/auth/login", controller.login);
     app.get("/api/auth/profile", controller.verifyToken, controller.profile);
     app.post("/api/auth/profile", controller.verifyToken, controller.updateUser);
-    
+
+    app.get("/api/auth/items", controller.verifyToken, controller.getItems);
+
     // app.put("/updateFirstName/:email", controller.updateFirstName);
     // app.put("/updateLastName/:email", controller.updateLastName);
 };
