@@ -25,7 +25,6 @@ exports.signup = (req, res) => {
             res.status(500).send({ message: err });
         }
         else {
-            console.log(user);
             res.status(200).send({ message: "User was registered successfully!" });
         }
     });
@@ -81,8 +80,7 @@ exports.login = (req, res) => {
         
         let token = jwt.sign(
             { user },
-            config.secret, 
-            { expiresIn: 86400 } // 24 hours
+            config.secret
         );
 
         res.status(200).send({
@@ -112,8 +110,8 @@ exports.profile = (req, res) => {
 };
 
 exports.updateUser = (req, res) => {
-    let user = req.body;
-    let id = req.query.id;
+    let user = {"firstName": req.body.firstName, "lastName": req.body.lastName};
+    let id = req.body.id;
 
     User.findByIdAndUpdate(id, user, { useFindAndModify: false, runValidators: true })
     .then(user => {
