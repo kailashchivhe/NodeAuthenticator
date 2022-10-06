@@ -15,6 +15,7 @@ module.exports = function(app) {
 
     app.get("/api/auth/items", controller.verifyToken, controller.getItems);
 
-    // app.put("/updateFirstName/:email", controller.updateFirstName);
-    // app.put("/updateLastName/:email", controller.updateLastName);
+    app.get("/api/auth/token", controller.verifyToken, controller.braintreeToken);
+
+    app.post("/api/auth/transaction", controller.verifyToken, controller.transaction );
 };

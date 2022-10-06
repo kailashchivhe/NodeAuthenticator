@@ -14,7 +14,7 @@ exports.signup = (req, res) => {
         firstName: req.body.firstName,
         lastName: req.body.lastName,
     });
-    braintree.createCustomer(newUser, req, res);
+    braintree.createCustomer(newUser, res);
 };
 
 exports.login = (req, res) => {
@@ -93,6 +93,29 @@ exports.updateUser = (req, res) => {
     .catch(err => {
         res.status(400).send(err);
     });
+}
+
+exports.braintreeToken = (req, res, next) => {
+    if( req.query.customerId ){
+        braintree.getToken(req.query.customerId, res);
+    }
+    else{
+        res.status(404).send({
+            message: "Invalid data passed"
+        });
+    }
+}
+
+exports.transaction = (req, res, next) => {
+    if(req.body.amount && req.body.nonceFromTheClient && req.body.deviceDataFromTheClient )
+    {
+    braintree.createTransaction(req.body.amount, req.body.nonceFromTheClient, req.body.deviceDataFromTheClient, res);
+    }
+    else{
+        res.status(404).send({
+            message: "Invalid data passed"
+        });
+    }
 }
 
 exports.verifyToken = (req, res, next) => {

@@ -8,7 +8,7 @@ const gateway = new braintree.BraintreeGateway({
     privateKey: "e1a475d96520b7f033209db7853da770"
 });
 
-exports.createCustomer = (newUser, req, res)=>{
+exports.createCustomer = (newUser, res)=>{
     gateway.customer.create({firstName: newUser.firstName, lastName: newUser.lastName, email:newUser.email}).then(result => {
         if(result.success){
             newUser.customerId = result.customer.id;
@@ -38,29 +38,44 @@ exports.createCustomer = (newUser, req, res)=>{
       });
 }
 
-function getToken(email){
+exports.getToken = (id, res) => {
     gateway.clientToken.generate({
-        customerId: email
+        customerId: id
       }).then(response => {
-        // pass clientToken to your front-end
-        const clientToken = response.clientToken
+        if(response.success){
+            const clientToken = response.clientToken
+            res.status(200).send({
+                message: 'Success',
+                token: clientToken
+            });
+        }
+        else{
+            res.status(404).send({
+                token: null,
+                message: "Customer not found"
+            });
+        }
       });
 }
 
-function checkout(){
-    app.post("/checkout", (req, res) => {
-        const nonceFromTheClient = req.body.payment_method_nonce;
-        // Use payment method nonce here
-      });
-}
-
-function createTransaction(){
+exports.createTransaction= (amount, nonceFromTheClient, deviceDataFromTheClient, res)=>{
     gateway.transaction.sale({
-        amount: "10.00",
+        amount: amount,
         paymentMethodNonce: nonceFromTheClient,
         deviceData: deviceDataFromTheClient,
         options: {
           submitForSettlement: true
         }
-      }).then(result => { });
+      }).then(result => {
+        if(result.success){
+            res.status(200).send({
+                message: 'Success'
+            });
+        }
+        else{
+            res.status(404).send({
+                message: "Failed to create transaction"
+            });
+        }
+    });
 }
