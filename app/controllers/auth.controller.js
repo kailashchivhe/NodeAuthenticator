@@ -1,6 +1,7 @@
 const config = require("../config/auth.config");
 const db = require("../models");
 const User = db.user;
+const Item = db.item;
 const braintree = require("braintree");
 
 var jwt = require("jsonwebtoken");
