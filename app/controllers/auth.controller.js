@@ -53,7 +53,8 @@ exports.login = (req, res) => {
 
         res.status(200).send({
             token: token,
-            id: user.id
+            id: user.id,
+            customerId: user.customerId
         })
     });
 };
