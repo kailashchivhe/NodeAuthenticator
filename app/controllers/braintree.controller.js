@@ -62,7 +62,6 @@ exports.createTransaction= (amount, nonceFromTheClient, deviceDataFromTheClient,
     gateway.transaction.sale({
         amount: amount,
         paymentMethodNonce: nonceFromTheClient,
-        deviceData: deviceDataFromTheClient,
         options: {
           submitForSettlement: true
         }
