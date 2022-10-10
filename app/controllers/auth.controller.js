@@ -110,7 +110,7 @@ exports.braintreeToken = (req, res, next) => {
 exports.transaction = (req, res, next) => {
     if(req.body.amount && req.body.nonceFromTheClient )
     {
-    braintree.createTransaction(req.body.amount, req.body.nonceFromTheClient, req.body.deviceDataFromTheClient, res);
+    braintree.createTransaction(req.body.amount, req.body.nonceFromTheClient, res);
     }
     else{
         res.status(404).send({

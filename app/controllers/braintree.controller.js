@@ -58,7 +58,7 @@ exports.getToken = (id, res) => {
       });
 }
 
-exports.createTransaction= (amount, nonceFromTheClient, deviceDataFromTheClient, res)=>{
+exports.createTransaction= (amount, nonceFromTheClient, res)=>{
     gateway.transaction.sale({
         amount: amount,
         paymentMethodNonce: nonceFromTheClient,
