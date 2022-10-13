@@ -97,8 +97,8 @@ exports.updateUser = (req, res) => {
 }
 
 exports.braintreeToken = (req, res, next) => {
-    if( req.query.customerId ){
-        braintree.getToken(req.query.customerId, res);
+    if( req.customerId ){
+        braintree.getToken(req.customerId, res);
     }
     else{
         res.status(404).send({
@@ -131,6 +131,7 @@ exports.verifyToken = (req, res, next) => {
           return res.status(401).send({ message: "Unauthorized!" });
         }
         req.email = decoded.email;
+        req.customerId = decoded.customerId;
         next();
       });
 };
