@@ -60,7 +60,7 @@ exports.login = (req, res) => {
 };
 
 exports.profile = (req, res) => {
-    let id = req.query.userId;
+    let id = req.userId;
     User.findById(id, function (err, docs) {
         if (err){
             console.log(err);
@@ -80,7 +80,7 @@ exports.profile = (req, res) => {
 
 exports.updateUser = (req, res) => {
     let user = {"firstName": req.body.firstName, "lastName": req.body.lastName};
-    let id = req.body.id;
+    let id = req.userId;
 
     User.findByIdAndUpdate(id, user, { useFindAndModify: false, runValidators: true })
     .then(user => {
@@ -130,16 +130,21 @@ exports.verifyToken = (req, res, next) => {
         if (err) {
           return res.status(401).send({ message: "Unauthorized!" });
         }
-        req.email = decoded.email;
-        req.customerId = decoded.customerId;
+        req.email = decoded.user.email;
+        req.customerId = decoded.user.customerId;
+        req.userId = decoded.user._id;
         next();
       });
 };
 
 exports.getItems = (req, res) => {
-    Item.find({}, (err, items) => {
+    let region = req.query.region;
+    var query = {};
+    if(region != "all"){
+        var query = { "region": region };
+    }
+    Item.find({query}, (err, items) => {
         if (err) throw err;
-        console.log(items);
         return res.status(200).send({ items: items });  
       });
 }
