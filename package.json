@@ -26,6 +26,7 @@
     "https": "^1.0.0",
     "jsonwebtoken": "^8.5.1",
     "mongodb": "^4.10.0",
-    "mongoose": "^6.6.1"
+    "mongoose": "^6.6.1",
+    "nodemon": "^2.0.20"
   }
 }

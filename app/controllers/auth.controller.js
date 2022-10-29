@@ -139,12 +139,16 @@ exports.verifyToken = (req, res, next) => {
 
 exports.getItems = (req, res) => {
     let region = req.query.region;
-    var query = {};
-    if(region != "all"){
-        var query = { "region": region };
+    if(region == "all"){
+        Item.find({}, (err, items) => {
+            if (err) throw err;
+            return res.status(200).send({ items: items });  
+        });
     }
-    Item.find({query}, (err, items) => {
-        if (err) throw err;
-        return res.status(200).send({ items: items });  
-      });
+    else{
+        Item.find({"region":region}, (err, items) => {
+            if (err) throw err;
+            return res.status(200).send({ items: items });  
+        });
+    }
 }
